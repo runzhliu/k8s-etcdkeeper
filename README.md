@@ -1,3 +1,20 @@
+## K8S ETCD Keeper
+
+The native [etcd-keeper](https://github.com/evildecay/etcdkeeper) needs etcd to **enable auth mode**, but if the etcd of k8s has auth enabled, **there cloud be some problems**(never try on the production cluster). In order to observe the kv pairs of etcd, this project is revised for a little and added another parameter `-k8sMode true`, which allows etcd-keeper to connect to the etcd cluster of k8s through tls mode. 
+
+Refer:
+
+1. ["etcdctl auth enable" command breaks Kubernetes cluster](https://github.com/etcd-io/etcd/issues/8458)
+2. [从安全的角度谈谈etcd](http://dockone.io/article/2434389)
+
+examples:
+
+![img_1.png](img_1.png)
+
+![img.png](img.png)
+
+---
+
 ![image](https://github.com/evildecay/etcdkeeper/blob/master/logo/logo-horizontal.png)
 ## ETCD Keeper
 * Lightweight etcd web client.
@@ -35,7 +52,7 @@
 * Right click on the tree node to add or delete.
 * Get data based on etcd user permissions.
   - Just display the list according to the configured permissions, and there will be time to add the configuration permission features.
-  - Each time you restart etcdkeeper, you need to enter the root username and password for each etcd server address. 
+  - Each time you restart etcdkeeper, you need to enter the root username and password for each etcd server address.
   - [enable etcdv3 authentication](https://github.com/etcd-io/etcd/blob/master/Documentation/op-guide/authentication.md)
   - [enable etcdv2 authentication](https://github.com/etcd-io/etcd/blob/master/Documentation/v2/authentication.md)
 * Display the status information of etcd, version, data size.

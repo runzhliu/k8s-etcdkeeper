@@ -28,6 +28,7 @@ var (
 	sep            = flag.String("sep", "/", "separator")
 	separator      = ""
 	usetls         = flag.Bool("usetls", false, "use tls")
+	k8sMode        = flag.Bool("k8sMode", false, "connect to k8s etcd")
 	cacert         = flag.String("cacert", "", "verify certificates of TLS-enabled secure servers using this CA bundle (v3)")
 	cert           = flag.String("cert", "", "identify secure client using this TLS certificate file (v3)")
 	keyfile        = flag.String("key", "", "identify secure client using this TLS key file (v3)")
@@ -582,7 +583,7 @@ func connect(w http.ResponseWriter, r *http.Request) {
 	uname := r.FormValue("uname")
 	passwd := r.FormValue("passwd")
 
-	if *useAuth {
+	if *useAuth && !*k8sMode {
 		if _, ok := rootUsers[host]; !ok && uname != "root" { // no root user
 			b, _ := json.Marshal(map[string]interface{}{"status": "root"})
 			io.WriteString(w, string(b))
@@ -595,12 +596,14 @@ func connect(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	if uinfo, ok := sess.Get("uinfo").(*userInfo); ok {
-		if host == uinfo.host && uname == uinfo.uname && passwd == uinfo.passwd {
-			info := getInfo(host)
-			b, _ := json.Marshal(map[string]interface{}{"status": "running", "info": info})
-			io.WriteString(w, string(b))
-			return
+	if !*k8sMode {
+		if uinfo, ok := sess.Get("uinfo").(*userInfo); ok {
+			if host == uinfo.host && uname == uinfo.uname && passwd == uinfo.passwd {
+				info := getInfo(host)
+				b, _ := json.Marshal(map[string]interface{}{"status": "running", "info": info})
+				io.WriteString(w, string(b))
+				return
+			}
 		}
 	}
 
@@ -992,7 +995,7 @@ func newClient(uinfo *userInfo) (*clientv3.Client, error) {
 		DialOptions:        []grpc.DialOption{grpc.WithBlock()},
 		MaxCallSendMsgSize: *sendMsgSize,
 	}
-	if *useAuth {
+	if *useAuth && !*k8sMode {
 		conf.Username = uinfo.uname
 		conf.Password = uinfo.passwd
 	}

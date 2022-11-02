@@ -1,0 +1,70 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: etcdkeeper
+  labels:
+    app: etcdkeeper
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: etcdkeeper
+  template:
+    metadata:
+      labels:
+        app: etcdkeeper
+    spec:
+      containers:
+        - name: etcdkeeper
+          image: runzhliu/k8s-etcdkeeper:latest
+          imagePullPolicy: Always
+          command:
+            - ./etcdkeeper
+          args:
+            - -k8sMode
+            - -usetls
+            - -cacert
+            - /app/conf/kube-ca.pem
+            - -cert
+            - /app/conf/peer.crt
+            - -key
+            - /app/conf/peer.key
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: etcdkeeper-config
+              mountPath: /app/conf
+      volumes:
+        - name: etcdkeeper-config
+          configMap:
+            name: etcdkeeper-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: etcdkeeper-service
+spec:
+  type: NodePort
+  ports:
+    - port: 8080 # the port that this service should serve on
+      # the container on each pod to connect to, can be a name
+      # (e.g. 'www') or a number (e.g. 80)
+      targetPort: 8080
+      protocol: TCP
+      nodePort: 30023
+  # just like the selector in the deployment,
+  # but this time it identifies the set of pods to load balance
+  # traffic to.
+  selector:
+    app: etcdkeeper
+---
+# 填充你的证书信息
+apiVersion: v1
+data:
+  kube-ca.pem: |-
+  peer.crt: |-
+  peer.key: |-
+kind: ConfigMap
+metadata:
+  name: etcdkeeper-config
