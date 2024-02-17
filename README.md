@@ -2,18 +2,26 @@
 
 The native [etcd-keeper](https://github.com/evildecay/etcdkeeper) needs etcd to **enable auth mode**, but if the etcd of k8s has auth enabled, **there cloud be some problems**(never try on the production cluster). In order to observe the kv pairs of etcd, this project is revised for a little and added another parameter `-k8sMode true`, which allows etcd-keeper to connect to the etcd cluster of k8s through tls mode. 
 
-Refer:
-
-1. ["etcdctl auth enable" command breaks Kubernetes cluster](https://github.com/etcd-io/etcd/issues/8458)
-2. [从安全的角度谈谈etcd](http://dockone.io/article/2434389)
-
-examples:
+## Examples
 
 ![img_1.png](img_1.png)
 
 ![img.png](img.png)
 
+## Build
+
+```shell
+docker build -t runzhliu/k8s-etcdkeeper:latest -f Dockerfile-k8s .
+```
+
+## Install
+
 Refer to [deployment.yaml](deploy/deployment.yaml) to install.
+
+## Reference
+
+1. ["etcdctl auth enable" command breaks Kubernetes cluster](https://github.com/etcd-io/etcd/issues/8458)
+2. [从安全的角度谈谈etcd](http://dockone.io/article/2434389)
 
 ---
 
