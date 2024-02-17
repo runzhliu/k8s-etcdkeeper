@@ -13,6 +13,8 @@ examples:
 
 ![img.png](img.png)
 
+Refer to [deployment.yaml](deploy/deployment.yaml) to install.
+
 ---
 
 ![image](https://github.com/evildecay/etcdkeeper/blob/master/logo/logo-horizontal.png)
